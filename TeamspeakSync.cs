@@ -1053,7 +1053,8 @@ namespace PRoConEvents
         int mInGamePromotionInterval = 20; // In minutes
         String mInGamePromotionMessage = "[NUMBER] players are having fun and kicking ass with their squadmates right now using our squad-synced TeamSpeak channels![NEWLINE]Type !teamspeak to join.";
         System.Timers.Timer mInGamePromotionTimer;
-
+        // -- TSSync Exclusion Variables (PURE) -------------------------------
+        private List<String> mExclusionList = new List<String>();
 
         /// <summary>Holds the player/punkbuster info combo from various games.</summary>
         public class GameClient
@@ -1267,7 +1268,7 @@ namespace PRoConEvents
         /// <summary>Allows PRoCon to get the name of this plugin.</summary>
         public string GetPluginName() { return "Teamspeak 3 Sync"; }
         /// <summary>Allows PRoCon to get the version of this plugin.</summary>
-        public string GetPluginVersion() { return "1.0.2.1 PURE 1.3.1"; }
+        public string GetPluginVersion() { return "1.0.2.1 PURE 1.3.2"; }
         /// <summary>Allows PRoCon to get the author's name of this plugin.</summary>
         public string GetPluginAuthor() { return "Imisnew2. Modified for PURE by CrashCourse001"; }
         /// <summary>Allows PRoCon to get the website for this plugin.</summary>
@@ -1677,7 +1678,29 @@ namespace PRoConEvents
             lstReturn.Add(new CPluginVariable("Section 9 - TSSync Promotion|In Game promotion interval (minutes)", typeof(int), mInGamePromotionInterval));
             lstReturn.Add(new CPluginVariable("Section 9 - TSSync Promotion|In Game Promotion Message", typeof(String), mInGamePromotionMessage));
 
+            // -- Section 10 - Exclusion List ---------------------------------------- (PURE)
+            lstReturn.Add(new CPluginVariable("Section 10 - TSSync Player Exclusion List|Add a soldier name... (case insensitive)", typeof(string), ""));
+            performExclusionListMaintenance();
+            for (int i = 0; i < mExclusionList.Count; i++)
+            {
+                lstReturn.Add(new CPluginVariable("Section 10 - TSSync Player Exclusion List|" + i.ToString() + ". Soldier name:", typeof(string), mExclusionList[i]));
+            }
+
             return lstReturn;
+        }
+
+        public void performExclusionListMaintenance() //PURE
+        {
+            mExclusionList.Sort();
+            for (int i = 0; i < mExclusionList.Count; i++)
+            {
+                String thisPlayer = mExclusionList[i];
+                if (String.IsNullOrEmpty(thisPlayer))
+                {
+                    mExclusionList.Remove(thisPlayer);
+                    i--;
+                }
+            }
         }
         /// <summary>Allows PRoCon to save the variables for persistence across sessions.</summary>
         public List<CPluginVariable> GetPluginVariables()
@@ -1749,6 +1772,14 @@ namespace PRoConEvents
             lstReturn.Add(new CPluginVariable("Min Number of Team Sync players on each team to start promoting TSSync", typeof(int), mMinSyncedPlayersForInGamePromotion));
             lstReturn.Add(new CPluginVariable("In Game promotion interval (minutes)", typeof(int), mInGamePromotionInterval));
             lstReturn.Add(new CPluginVariable("In Game Promotion Message", typeof(String), mInGamePromotionMessage));
+
+            // -- Section 10 - Exclusion List ---------------------------------------- (PURE)
+            lstReturn.Add(new CPluginVariable("Add a soldier name... (case insensitive)", typeof(string), ""));
+            performExclusionListMaintenance();
+            for (int i = 0; i < mExclusionList.Count; i++)
+            {
+                lstReturn.Add(new CPluginVariable("TSSync Player Exclusion List|" + i.ToString() + ". Soldier name:", typeof(string), mExclusionList[i]));
+            }
 
             return lstReturn;
         }
@@ -1915,9 +1946,33 @@ namespace PRoConEvents
             }
             else if (strVariable == "In Game Promotion Message")
                 mInGamePromotionMessage = strValue;
+            else if (strVariable.Contains("Soldier name:") && strVariable.Contains("TSSync Player Exclusion") && !String.IsNullOrEmpty(strValue.Trim()))
+            {
+                strValue = strValue.Trim().ToLower();
+                try
+                {
+                    mExclusionList[getConfigIndex(strVariable)] = strValue;
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    mExclusionList.Add(strValue);
+                }
+                //performExclusionListMaintenance();
+            }
+            else if (strVariable.Contains("Add a soldier name..."))
+            {
+                mExclusionList.Add(strValue.Trim().ToLower());
+                //performExclusionListMaintenance();
+            }
+
+            // -- Section 10 
         }
 
-
+        public int getConfigIndex(string configString)
+        {
+            int lineLocation = configString.IndexOf('|');
+            return Int32.Parse(configString.Substring(lineLocation + 1, configString.IndexOf('.') - lineLocation - 1));
+        }
 
         /// <summary>Is called when the plugin is successfully loaded.</summary>
         public void OnPluginLoaded(String strHostName, String strPort, String strPRoConVersion)
