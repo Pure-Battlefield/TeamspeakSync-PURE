@@ -1054,6 +1054,7 @@ namespace PRoConEvents
         String mInGamePromotionMessage = "[NUMBER] players are having fun and kicking ass with their squadmates right now using our squad-synced TeamSpeak channels![NEWLINE]Type !teamspeak to join.";
         System.Timers.Timer mInGamePromotionTimer;
         // -- TSSync Exclusion Variables (PURE) -------------------------------
+        Boolean mEnableTSExclusion = true;
         private List<String> mExclusionList = new List<String>();
 
         /// <summary>Holds the player/punkbuster info combo from various games.</summary>
@@ -1268,9 +1269,9 @@ namespace PRoConEvents
         /// <summary>Allows PRoCon to get the name of this plugin.</summary>
         public string GetPluginName() { return "Teamspeak 3 Sync"; }
         /// <summary>Allows PRoCon to get the version of this plugin.</summary>
-        public string GetPluginVersion() { return "1.0.2.1 PURE 1.3.5"; }
+        public string GetPluginVersion() { return "1.0.2.1 PURE 1.4.0"; }
         /// <summary>Allows PRoCon to get the author's name of this plugin.</summary>
-        public string GetPluginAuthor() { return "Imisnew2. Modified for PURE by CrashCourse001"; }
+        public string GetPluginAuthor() { return "Imisnew2. Modified for PURE by CrashCourse001 and Analytalica"; }
         /// <summary>Allows PRoCon to get the website for this plugin.</summary>
         public string GetPluginWebsite() { return "www.TeamPlayerGaming.com/members/Imisnew2.html"; }
         /// <summary>Allows ProCon to get a description of this plugin.</summary>
@@ -1679,6 +1680,7 @@ namespace PRoConEvents
             lstReturn.Add(new CPluginVariable("Section 9 - TSSync Promotion|In Game Promotion Message", typeof(String), mInGamePromotionMessage));
 
             // -- Section 9.1 - Exclusion List ---------------------------------------- (PURE)
+            lstReturn.Add(new CPluginVariable("Section 9.1 - TSSync Player Exclusion List|Enable TSSync Exclusion", typeof(Boolean), mEnableTSExclusion));
             lstReturn.Add(new CPluginVariable("Section 9.1 - TSSync Player Exclusion List|Add a soldier name... (case insensitive)", typeof(string), ""));
             performExclusionListMaintenance();
             for (int i = 0; i < mExclusionList.Count; i++)
@@ -1774,6 +1776,7 @@ namespace PRoConEvents
             lstReturn.Add(new CPluginVariable("In Game Promotion Message", typeof(String), mInGamePromotionMessage));
 
             // -- Section 9.1 - Exclusion List ---------------------------------------- (PURE)
+            lstReturn.Add(new CPluginVariable("Enable TSSync Exclusion", typeof(Boolean), mEnableTSExclusion));
             lstReturn.Add(new CPluginVariable("Add a soldier name... (case insensitive)", typeof(string), ""));
             performExclusionListMaintenance();
             for (int i = 0; i < mExclusionList.Count; i++)
@@ -1946,8 +1949,10 @@ namespace PRoConEvents
             }
             else if (strVariable == "In Game Promotion Message")
                 mInGamePromotionMessage = strValue;
-            
+
             //Section 9.1 PURE
+            else if (strVariable == "Enable TSSync Exclusion" && Boolean.TryParse(strValue, out blnOut))
+                mEnableTSExclusion = blnOut;
             else if (strVariable.Contains("Soldier name:"))
             {
                 strValue = strValue.Trim().ToLower();
@@ -2123,46 +2128,85 @@ namespace PRoConEvents
         /// <summary>Is called when a player spawns.</summary>
         public void OnPlayerSpawned(String strSoldierName, Inventory spawnedInventory)
         {
-            if (mEnabled && !mTsReconnecting)
-                addToActionQueue(Commands.PlayerSpawned, strSoldierName);
+            if (mEnabled && !mTsReconnecting) //PURE
+                if (!mEnableTSExclusion || !mExclusionList.Contains(strSoldierName.Trim().ToLower()))
+                    addToActionQueue(Commands.PlayerSpawned, strSoldierName);
+                else
+                    debugPlayerIgnored(strSoldierName);
         }
 
         /// <summary>Is called when a player joins the server.</summary>
         public void OnPlayerJoin(String strSoldierName)
         {
-            if (mEnabled && !mTsReconnecting)
-                addToActionQueue(Commands.PlayerJoined, strSoldierName);
+            if (mEnabled && !mTsReconnecting) //PURE
+                if (!mEnableTSExclusion || !mExclusionList.Contains(strSoldierName.Trim().ToLower()))
+                    addToActionQueue(Commands.PlayerJoined, strSoldierName);
+                else
+                    debugPlayerIgnored(strSoldierName);
         }
         /// <summary>Is called when a player leaves the server.</summary>
         public void OnPlayerLeft(String strSoldierName)
         {
-            if (mEnabled && !mTsReconnecting)
-                addToActionQueue(Commands.PlayerLeft, strSoldierName);
+            if (mEnabled && !mTsReconnecting) //PURE
+                if (!mEnableTSExclusion || !mExclusionList.Contains(strSoldierName.Trim().ToLower()))
+                    addToActionQueue(Commands.PlayerLeft, strSoldierName);
+                else
+                    debugPlayerIgnored(strSoldierName);
         }
         /// <summary>Is called when a player changes teams.</summary>
         public void OnPlayerTeamChange(String strSoldierName, Int32 iTeamID, Int32 iSquadID)
         {
-            if (mEnabled && !mTsReconnecting)
-                addToActionQueue(Commands.PlayerSwappedTeamsOrSquads, strSoldierName, iTeamID, iSquadID);
+            if (mEnabled && !mTsReconnecting) //PURE
+                if (!mEnableTSExclusion || !mExclusionList.Contains(strSoldierName.Trim().ToLower()))
+                    addToActionQueue(Commands.PlayerSwappedTeamsOrSquads, strSoldierName, iTeamID, iSquadID);
+                else
+                    debugPlayerIgnored(strSoldierName);
         }
+
         /// <summary>Is called when a player changes squads.</summary>
         public void OnPlayerSquadChange(String strSoldierName, Int32 iTeamID, Int32 iSquadID)
         {
-            if (mEnabled && !mTsReconnecting)
-                addToActionQueue(Commands.PlayerSwappedTeamsOrSquads, strSoldierName, iTeamID, iSquadID);
+            if (mEnabled && !mTsReconnecting) //PURE
+                if (!mEnableTSExclusion || !mExclusionList.Contains(strSoldierName.Trim().ToLower()))
+                    addToActionQueue(Commands.PlayerSwappedTeamsOrSquads, strSoldierName, iTeamID, iSquadID);
+                else
+                    debugPlayerIgnored(strSoldierName);
+        }
+
+        public void debugPlayerIgnored(String soldierName) //PURE
+        {
+            soldierName = soldierName.Trim().ToLower();
+            debugWrite(dbgEvents, "[Event] Ignoring event triggered by " + soldierName + ", as " + soldierName + " is an excluded player.");
         }
         /// <summary>Is called when a player list is received.</summary>
         public void OnListPlayers(List<CPlayerInfo> lstPlayers, CPlayerSubset cpsSubset)
         {
             if (mEnabled && !mTsReconnecting)
+            {
+                List<CPlayerInfo> lstPlayersFiltered = new List<CPlayerInfo>();
+                if (mEnableTSExclusion)
+                {
+                    foreach (CPlayerInfo p in lstPlayers) //PURE
+                    {
+                        if (!mExclusionList.Contains(p.SoldierName.Trim().ToLower()))
+                            lstPlayersFiltered.Add(p);
+                        else
+                            debugWrite(dbgEvents, "[Event] Removed " + p.SoldierName.Trim().ToLower() + " from player list, as " + p.SoldierName.Trim().ToLower() + " is an excluded player.");
+                    }
+                    lstPlayers = lstPlayersFiltered;
+                }
                 if (cpsSubset.Subset == CPlayerSubset.PlayerSubsetType.All)
                     addToActionQueue(Commands.UpdateGmClientInfo, lstPlayers);
+            }
         }
         /// <summary>Is called when a single player's punkbuster info is received.</summary>
         public void OnPunkbusterPlayerInfo(CPunkbusterInfo cpbiPlayer)
         {
-            if (mEnabled && !mTsReconnecting)
-                addToActionQueue(Commands.UpdatePbClientInfo, cpbiPlayer);
+            if (mEnabled && !mTsReconnecting) //PURE
+                if (!mEnableTSExclusion || !mExclusionList.Contains(cpbiPlayer.SoldierName.Trim().ToLower()))
+                    addToActionQueue(Commands.UpdatePbClientInfo, cpbiPlayer);
+                else
+                    debugPlayerIgnored(cpbiPlayer.SoldierName);
         }
         /// <summary>Is called when the round is started (BFBC2).</summary>
         public void OnLevelStarted()
@@ -2193,26 +2237,33 @@ namespace PRoConEvents
         public void OnGlobalChat(string speaker, string message)
         {
 
-            if (mEnabled && !mTsReconnecting)
+            if (mEnabled && !mTsReconnecting) 
             {
-                //Figure out which command to send. 
-                switch (message)
+                if (!mEnableTSExclusion || !mExclusionList.Contains(speaker.Trim().ToLower())) //PURE
                 {
-                    case "!tssquads":
-                        addToActionQueue(Commands.DisplayTSSquadList, speaker);
-                        break;
-                    case "!tslobby":
-                        addToActionQueue(Commands.SetSyncToStaging, speaker);
-                        break;
-                    case "!tsteam":
-                        addToActionQueue(Commands.SetSyncToTeam, speaker);
-                        break;
-                    case "/!tsnosync":
-                        addToActionQueue(Commands.SetNoSync, speaker);
-                        break;
-                    case "!tssync":
-                        addToActionQueue(Commands.ResetUserSyncFlags, speaker);
-                        break;
+                    //Figure out which command to send. 
+                    switch (message)
+                    {
+                        case "!tssquads":
+                            addToActionQueue(Commands.DisplayTSSquadList, speaker);
+                            break;
+                        case "!tslobby":
+                            addToActionQueue(Commands.SetSyncToStaging, speaker);
+                            break;
+                        case "!tsteam":
+                            addToActionQueue(Commands.SetSyncToTeam, speaker);
+                            break;
+                        case "/!tsnosync":
+                            addToActionQueue(Commands.SetNoSync, speaker);
+                            break;
+                        case "!tssync":
+                            addToActionQueue(Commands.ResetUserSyncFlags, speaker);
+                            break;
+                    }
+                }
+                else
+                {
+                    debugPlayerIgnored(speaker);
                 }
             }
         }
