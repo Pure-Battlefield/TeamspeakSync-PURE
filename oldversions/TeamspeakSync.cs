@@ -1,5 +1,4 @@
 ﻿/*  Copyright 2010 Imisnew2
-    Modified by PURE (gamewithpure.org)
 
     http://www.TeamPlayerGaming.com/members/Imisnew2.html
 
@@ -1115,9 +1114,9 @@ namespace PRoConEvents
             /// <summary>Sets the game information</summary>
             public GameClient GmClient { get { return gmClient; } set { gmClient = value; } }
             // <summary>Specifies whether this client is has opted to exempt himself/herself from swapping.</summary>
-            public Boolean IsNoSync { get { return noSync; } set { noSync = value; } }
+            public Boolean         IsNoSync    { get { return noSync; } set { noSync = value; } }
             /// <summary>Specifies whether the client should be force swapped to the staging channel. </summary>
-            public Boolean IsSyncToStaging { get { return syncToStaging; } set { syncToStaging = value; } }
+            public Boolean         IsSyncToStaging     { get { return syncToStaging; } set { syncToStaging = value; } }
             /// <summary>Specifies whether the client should be force swapped to the team channel.  </summary>
             public Boolean IsSyncToTeam { get { return syncToTeam; } set { syncToTeam = value; } }
 
@@ -1652,16 +1651,16 @@ namespace PRoConEvents
                 lstReturn.Add(new CPluginVariable("Section 5 - User Messages|Message Display Duration", typeof(Int32), msgDuration));
             }
             // -- Section 6 - Debug Information -----------------------------------
-            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tssquads", typeof(Boolean), mEnableTSSquadList));
-            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tslobby", typeof(Boolean), mEnableTSStaging));
-            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tsteam", typeof(Boolean), mEnableTSTeam));
-            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tsnosync", typeof(Boolean), mEnableTSNoSync));
+            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tssquads",                       typeof(Boolean), mEnableTSSquadList));
+            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tslobby",                         typeof(Boolean), mEnableTSStaging));
+            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tsteam",                            typeof(Boolean), mEnableTSTeam));
+            lstReturn.Add(new CPluginVariable("Section 6 - In-Game Commands|Enable !tsnosync",                          typeof(Boolean), mEnableTSNoSync));
             // -- Section 7 - Debug Information -----------------------------------
-            lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Events)", typeof(Boolean), dbgEvents));
-            lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Clients)", typeof(Boolean), dbgClients));
+            lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Events)",   typeof(Boolean), dbgEvents));
+            lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Clients)",  typeof(Boolean), dbgClients));
             lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Channels)", typeof(Boolean), dbgChannels));
             lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Swapping)", typeof(Boolean), dbgSwapping));
-            lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Network)", typeof(Boolean), dbgNetwork));
+            lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Network)",  typeof(Boolean), dbgNetwork));
             lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (Bouncer)", typeof(Boolean), dbgBouncer));
             lstReturn.Add(new CPluginVariable("Section 7 - Debug Information|Show Debug Messages (TSSync Promotion)", typeof(Boolean), dbgTSSyncPromote)); // PURE
 
@@ -1878,18 +1877,16 @@ namespace PRoConEvents
                 mBouncerKickMessage = strValue;
 
             // -- Section 9 - TSSync Promotion ----------------------------------- (PURE)
-            else if (strVariable == "Enable TSSync Promotion" && Boolean.TryParse(strValue, out blnOut))
-            {
+            else if (strVariable == "Enable TSSync Promotion" && Boolean.TryParse(strValue, out blnOut)) {
                 mEnableTSPromotion = blnOut;
-                if (mEnableTSPromotion && !mInGamePromotionTimer.Enabled)
-                {
+                if (mEnableTSPromotion && !mInGamePromotionTimer.Enabled) {
                     debugWrite(dbgTSSyncPromote, "[TSSync Promote] - Starting in game promotion timer");
                     mInGamePromotionTimer.Start();
                 }
                 else if (!mEnableTSPromotion && mInGamePromotionTimer.Enabled)
                 {
                     debugWrite(dbgTSSyncPromote, "[TSSync Promote] - Stopping in game promotion timer");
-                    mInGamePromotionTimer.Stop();
+                    mInGamePromotionTimer.Stop(); 
                 }
             }
             else if (strVariable == "Maximum Number of Squad Synced players to be considered seeding" && Int32.TryParse(strValue, out intOut))
@@ -2031,8 +2028,7 @@ namespace PRoConEvents
             const int MAX_MESSAGE_LENGTH = 127;
             String[] stringSeparators = new string[] { "[NEWLINE]" };
             String[] messages = msg.Split(stringSeparators, StringSplitOptions.None);
-            foreach (String message in messages)
-            {
+            foreach (String message in messages) {
                 if (message.Length <= MAX_MESSAGE_LENGTH)
                     this.ExecuteCommand("procon.protected.send", "admin.say", message, "team", "" + teamID);
                 else
@@ -2127,12 +2123,12 @@ namespace PRoConEvents
                 //addToActionQueue(Commands.ResetAllUsersSyncFlags);
                 addToActionQueue(Commands.CheckAllClientsForSwapping);
             }
-
+                
         }
         /// <summary>Used to handle the in-game control commands. </summary>
         public void OnGlobalChat(string speaker, string message)
         {
-
+            
             if (mEnabled && !mTsReconnecting)
             {
                 //Figure out which command to send. 
@@ -2300,46 +2296,44 @@ namespace PRoConEvents
                             playerSwappedTeamsOrSquads((String)mCurrentAction.Argument, (Int32)mCurrentAction.Argument, (Int32)mCurrentAction.Argument);
                             break;
                         case Commands.SetSyncToStaging:
-                            if (mEnableTSStaging)
+                            if(mEnableTSStaging)
                             {
                                 debugWrite(dbgEvents, "[Event] Processing Sync to Staging event for Player.");
                                 SetSyncToStagingFlagForPlayer((string)mCurrentAction.Argument);
                             }
                             break;
                         case Commands.SetSyncToTeam:
-                            if (mEnableTSTeam)
+                            if(mEnableTSTeam)
                             {
                                 debugWrite(dbgEvents, "[Event] Processing Set Sync to Team event for Player.");
                                 SetSyncToTeamFlagForPlayer((string)mCurrentAction.Argument);
                             }
                             break;
                         case Commands.SetNoSync:
-                            if (mEnableTSNoSync)
+                            if(mEnableTSNoSync)
                             {
                                 debugWrite(dbgEvents, "[Event] Processing Set No Sync event for Player.");
                                 SetNoSyncFlagForPlayer((string)mCurrentAction.Argument);
                             }
-                            break;
+                            break; 
                         case Commands.ResetUserSyncFlags:
                             debugWrite(dbgEvents, "[Event] Processing Sync Flag Reset for Player.");
-                            ResetSyncFlagsForPlayer((string)mCurrentAction.Argument);
+                            ResetSyncFlagsForPlayer((string) mCurrentAction.Argument);
                             break;
                         case Commands.ResetAllUsersSyncFlags:
                             debugWrite(dbgEvents, "[Event] Resetting all player sync flags.");
                             ResetAllUserSyncFlags();
                             break;
                         case Commands.DisplayTSSquadList:
-                            if (mEnableTSSquadList)
+                            if(mEnableTSSquadList)
                             {
                                 debugWrite(dbgEvents, "[Event] Processing DisplayTSSquadList event.");
                                 DisplayTsSquadList((string)mCurrentAction.Argument);
                             }
-
+                            
                             break;
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     consoleWrite("^8A fatal error occurred during processing a command!");
                     consoleWrite("^8^bMessage:^n^0 " + e.Message);
                     consoleWrite("^8^bStack Trace:^n^0 " + e.StackTrace);
@@ -2937,9 +2931,9 @@ namespace PRoConEvents
             List<string> temp_mTSSyncedUsers = new List<string>(); // PURE.
 
             // Update clientInfo to have the sync flags of all previously connected users.  
-            foreach (MasterClient mstClient in mClientAllInfo)
+            foreach(MasterClient mstClient in mClientAllInfo)
             {
-                foreach (MasterClient innerClient in clientInfo)
+                foreach(MasterClient innerClient in clientInfo)
                 {
                     if (mstClient.HasGmClient && innerClient.HasGmClient)
                     {
@@ -3160,7 +3154,7 @@ namespace PRoConEvents
 
                 // Determine the channel that we need to move to.  
                 int? swapChannelId = ts3EnableDropoff ? mDropoffChannel.tsId : mStagingChannel.tsId;
-
+                
                 // Move the client to the appropriate channel (Dropoff or staging)
                 if (client.TsClient.medChannelId != swapChannelId)
                 {
@@ -3237,7 +3231,7 @@ namespace PRoConEvents
                         {
                             // Player may not have a TS client yet depending on timing.
                             debugWrite(dbgBouncer, "[BNC] Player " + Name + " has TS Client.");
-
+                            
                             int chanId = mstClient.TsClient.medChannelId.HasValue ?
                                 mstClient.TsClient.medChannelId.Value : -1;
 
@@ -3293,9 +3287,7 @@ namespace PRoConEvents
                             debugWrite(dbgBouncer, "[BNC] " + kMsg);
 
                             this.ExecuteCommand("procon.protected.send", "admin.kickPlayer", Name, mBouncerKickMessage);
-                        }
-                        else
-                        {
+                        } else {
                             debugWrite(dbgBouncer, "[BNC] Player " + Name + " found. Not Kicking.");
                         }
 
@@ -3506,7 +3498,7 @@ namespace PRoConEvents
             channelCreateQuery.addParameter("channel_name", Name);
             channelCreateQuery.addParameter("channel_flag_permanent", "1");
             channelCreateQuery.addParameter("cpid", mStagingChannel.tsId.Value.ToString());
-            channelCreateQuery.addParameter("channel_codec_quality", "10");
+            channelCreateQuery.addParameter( "channel_codec_quality", "10");
             debugWrite(dbgChannels, "[Channels] Attempting to create ^bTeam^n Channel: {0}.", Name);
 
             // Determine if we should set a password.
@@ -3565,7 +3557,7 @@ namespace PRoConEvents
             channelCreateQuery.addParameter("channel_name", Name);
             channelCreateQuery.addParameter("channel_flag_permanent", "1");
             channelCreateQuery.addParameter("cpid", mTeamChannels[TeamId].tsId.Value.ToString());
-            channelCreateQuery.addParameter("channel_codec_quality", "10");
+			channelCreateQuery.addParameter( "channel_codec_quality", "10");
             debugWrite(dbgChannels, "[Channels] Attempting to create ^bSquad^n Channel: {0}.", Name);
 
             // Determine if we should set a password.
@@ -3821,56 +3813,57 @@ namespace PRoConEvents
         public void DisplayTsSquadList(string playerName)
         {
             debugWrite(dbgEvents, "[Event] Displaying TS squad list for " + playerName);
-            string[] squadNames = { "No Squad", "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "Xray", "Yankee", "Zulu" };
+            string[] squadNames =
+                {"No Squad","Alpha","Bravo","Charlie","Delta","Echo","Foxtrot","Golf","Hotel","India","Juliet","Kilo","Lima","Mike","November","Oscar","Papa","Quebec","Romeo","Sierra","Tango","Uniform","Victor","Whiskey","Xray","Yankee","Zulu"};
             //Find the player's team.  
             int playerTeam = -1;
             //First key is team ID, second key is squad ID.  Inner value is the squad player count info.  
             Dictionary<int, Dictionary<int, TsGameSquadInfo>> squadInfo = new Dictionary<int, Dictionary<int, TsGameSquadInfo>>();
-
-            foreach (MasterClient client in mClientAllInfo)
+            
+            foreach(MasterClient client in mClientAllInfo)
             {
-                if (client.HasGmClient)
+                if(client.HasGmClient)
                 {
                     int clientTeam = client.GmClient.TeamId;
                     int clientSquad = client.GmClient.SquadId;
-
+                    
                     //If we've found the callee, save this person's team id.  
-                    if (client.GmClient.Name == playerName)
+                    if(client.GmClient.Name == playerName)
                     {
                         playerTeam = clientTeam;
                     }
 
                     //Make sure dictionary has all appropriate objects.
-                    if (!squadInfo.ContainsKey(clientTeam))
+                    if(!squadInfo.ContainsKey(clientTeam))
                     {
                         debugWrite(dbgEvents, "[Event] Creating team " + clientTeam);
                         squadInfo[clientTeam] = new Dictionary<int, TsGameSquadInfo>();
                     }
-                    if (!squadInfo[clientTeam].ContainsKey(clientSquad))
+                    if(!squadInfo[clientTeam].ContainsKey(clientSquad))
                     {
                         debugWrite(dbgEvents, "[Event] Creating squad " + clientSquad + " for team " + clientTeam);
                         squadInfo[clientTeam][clientSquad] = new TsGameSquadInfo();
                     }
 
                     squadInfo[clientTeam][clientSquad].InGameCount++;
-                    if (client.HasTsClient)
+                    if(client.HasTsClient)
                     {
                         squadInfo[clientTeam][clientSquad].TsCount++;
                     }
                 }
             }
-
-            if (playerTeam != -1)
+            
+            if(playerTeam != -1)
             {
                 const string squadMessage = "{0}: ({1}/{2})";
                 List<string> messagesToSend = new List<string>();
                 //Get the squad list for the appropriate team.  Ensure at least 1 person on TS, and at least 1 free slot.  
                 Dictionary<int, TsGameSquadInfo> squads = squadInfo[playerTeam];
                 bool squadFound = false;
-                foreach (KeyValuePair<int, TsGameSquadInfo> teamSquad in squads)
+                foreach(KeyValuePair<int, TsGameSquadInfo> teamSquad in squads)
                 {
-                    debugWrite(dbgEvents, "[Event] Squad " + squadNames[teamSquad.Key] + ", TS: " + teamSquad.Value.TsCount + ", Game: " + teamSquad.Value.InGameCount);
-                    if (teamSquad.Value.TsCount > 0 && teamSquad.Value.TsCount < 5)
+                    debugWrite(dbgEvents, "[Event] Squad " + squadNames[teamSquad.Key] + ", TS: "+ teamSquad.Value.TsCount + ", Game: "+ teamSquad.Value.InGameCount );
+                    if(teamSquad.Value.TsCount > 0 && teamSquad.Value.TsCount < 5)
                     {
                         squadFound = true;
                         string message = String.Format(squadMessage, squadNames[teamSquad.Key], teamSquad.Value.TsCount,
@@ -3879,7 +3872,7 @@ namespace PRoConEvents
                     }
                 }
                 //If there are no squads, tell the player so.  Otherwise, write the message to the player.  
-                if (!squadFound)
+                if(!squadFound)
                 {
                     sayToPlayer("No free squads found. Start one yourself and encourage people to join!", playerName);
                 }
@@ -3888,10 +3881,10 @@ namespace PRoConEvents
                     sayToPlayer("Squads with 1-4 Teamspeak Players:", playerName);
                     sayToPlayer("Key: Name (# TS Players/# Squad Members)", playerName);
                     string finalMessageString = "";
-                    for (int i = 0; i < messagesToSend.Count; i++)
+                    for(int i = 0; i<messagesToSend.Count; i++)
                     {
                         finalMessageString += messagesToSend[i];
-                        if (i != (messagesToSend.Count - 1))
+                        if(i != (messagesToSend.Count-1))
                         {
                             finalMessageString += ", ";
                         }
@@ -3906,12 +3899,12 @@ namespace PRoConEvents
         /// </summary>
         public void ResetAllUserSyncFlags()
         {
-            foreach (MasterClient user in mClientAllInfo)
+            foreach(MasterClient user in mClientAllInfo)
             {
                 user.IsSyncToTeam = false;
                 user.IsSyncToStaging = false;
                 user.IsNoSync = false;
-
+                
             }
         }
         /// <summary>Sets the NoSync flag for a player on the server.  This player will be ignored by Teamsync until the next round or until the flag is reset. </summary>
@@ -3919,7 +3912,7 @@ namespace PRoConEvents
         {
             foreach (MasterClient user in mClientAllInfo)
             {
-                if (user.HasGmClient && user.GmClient.Name == playerName)
+                if(user.HasGmClient && user.GmClient.Name == playerName)
                 {
                     user.IsNoSync = true;
                     user.IsSyncToStaging = false;
@@ -3927,7 +3920,7 @@ namespace PRoConEvents
                     sayToPlayer("Squad sync disabled for you.", user.GmClient.Name);
                     sayToPlayer("Type !tssync to re-enable squad sync.", user.GmClient.Name);
                     sayToPlayer("Squad sync will automatically re-enable at round end.", user.GmClient.Name);
-
+                    
                     break;
                 }
             }
@@ -3946,7 +3939,7 @@ namespace PRoConEvents
                     sayToPlayer("Type !tssync to re-enable squad sync.", user.GmClient.Name);
                     sayToPlayer("Squad sync will automatically re-enable at round end.", user.GmClient.Name);
                     addToActionQueue(Commands.CheckClientForSwapping, user);
-
+                    
                     break;
                 }
             }
@@ -3969,7 +3962,7 @@ namespace PRoConEvents
                     break;
                 }
             }
-
+            
         }
         /// <summary>Sets all player Sync flags to false.  This resumes default TSSync behavior.</summary>
         public void ResetSyncFlagsForPlayer(string playerName)
@@ -3985,7 +3978,7 @@ namespace PRoConEvents
                     addToActionQueue(Commands.CheckClientForSwapping, user);
                     sayToPlayer("Squad sync re-enabled.", user.GmClient.Name);
                     //Following line not needed with new TS settings. 
-                    //sayToPlayer("Squad sync only functions with 6+ TS players.", user.GmClient.Name);
+					//sayToPlayer("Squad sync only functions with 6+ TS players.", user.GmClient.Name);
                     break;
                 }
             }
