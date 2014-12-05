@@ -1268,7 +1268,7 @@ namespace PRoConEvents
         /// <summary>Allows PRoCon to get the name of this plugin.</summary>
         public string GetPluginName() { return "Teamspeak 3 Sync"; }
         /// <summary>Allows PRoCon to get the version of this plugin.</summary>
-        public string GetPluginVersion() { return "1.0.2.1 PURE 1.3.3"; }
+        public string GetPluginVersion() { return "1.0.2.1 PURE 1.3.4"; }
         /// <summary>Allows PRoCon to get the author's name of this plugin.</summary>
         public string GetPluginAuthor() { return "Imisnew2. Modified for PURE by CrashCourse001"; }
         /// <summary>Allows PRoCon to get the website for this plugin.</summary>
@@ -1951,12 +1951,16 @@ namespace PRoConEvents
             else if (strVariable.Contains("Soldier name:") && strVariable.Contains("TSSync Player Exclusion"))
             {
                 strValue = strValue.Trim().ToLower();
+                consoleWrite("strVariable: " + strVariable + ", strValue Trimmed Lowered: " + strValue);
                 try
                 {
-                    mExclusionList[getConfigIndex(strVariable)] = strValue;
+                    int n = getConfigIndex(strVariable);
+                    consoleWrite("Setting " + n);
+                    mExclusionList[n] = strValue;
                 }
                 catch (ArgumentOutOfRangeException e)
                 {
+                    consoleWrite("" + e);
                     mExclusionList.Add(strValue);
                 }
                 //performExclusionListMaintenance();
