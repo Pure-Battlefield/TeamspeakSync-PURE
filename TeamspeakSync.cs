@@ -1678,12 +1678,12 @@ namespace PRoConEvents
             lstReturn.Add(new CPluginVariable("Section 9 - TSSync Promotion|In Game promotion interval (minutes)", typeof(int), mInGamePromotionInterval));
             lstReturn.Add(new CPluginVariable("Section 9 - TSSync Promotion|In Game Promotion Message", typeof(String), mInGamePromotionMessage));
 
-            // -- Section 10 - Exclusion List ---------------------------------------- (PURE)
-            lstReturn.Add(new CPluginVariable("Section 10 - TSSync Player Exclusion List|Add a soldier name... (case insensitive)", typeof(string), ""));
+            // -- Section 9.1 - Exclusion List ---------------------------------------- (PURE)
+            lstReturn.Add(new CPluginVariable("Section 9.1 - TSSync Player Exclusion List|Add a soldier name... (case insensitive)", typeof(string), ""));
             performExclusionListMaintenance();
             for (int i = 0; i < mExclusionList.Count; i++)
             {
-                lstReturn.Add(new CPluginVariable("Section 10 - TSSync Player Exclusion List|" + i.ToString() + ". Soldier name:", typeof(string), mExclusionList[i]));
+                lstReturn.Add(new CPluginVariable("Section 9.1 - TSSync Player Exclusion List|" + i.ToString() + ". Soldier name:", typeof(string), mExclusionList[i]));
             }
 
             return lstReturn;
@@ -1773,7 +1773,7 @@ namespace PRoConEvents
             lstReturn.Add(new CPluginVariable("In Game promotion interval (minutes)", typeof(int), mInGamePromotionInterval));
             lstReturn.Add(new CPluginVariable("In Game Promotion Message", typeof(String), mInGamePromotionMessage));
 
-            // -- Section 10 - Exclusion List ---------------------------------------- (PURE)
+            // -- Section 9.1 - Exclusion List ---------------------------------------- (PURE)
             lstReturn.Add(new CPluginVariable("Add a soldier name... (case insensitive)", typeof(string), ""));
             performExclusionListMaintenance();
             for (int i = 0; i < mExclusionList.Count; i++)
@@ -1946,6 +1946,8 @@ namespace PRoConEvents
             }
             else if (strVariable == "In Game Promotion Message")
                 mInGamePromotionMessage = strValue;
+            
+            //Section 9.1 PURE
             else if (strVariable.Contains("Soldier name:") && strVariable.Contains("TSSync Player Exclusion") && !String.IsNullOrEmpty(strValue.Trim()))
             {
                 strValue = strValue.Trim().ToLower();
@@ -1965,7 +1967,6 @@ namespace PRoConEvents
                 //performExclusionListMaintenance();
             }
 
-            // -- Section 10 
         }
 
         public int getConfigIndex(string configString)
