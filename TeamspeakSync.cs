@@ -1268,7 +1268,7 @@ namespace PRoConEvents
         /// <summary>Allows PRoCon to get the name of this plugin.</summary>
         public string GetPluginName() { return "Teamspeak 3 Sync"; }
         /// <summary>Allows PRoCon to get the version of this plugin.</summary>
-        public string GetPluginVersion() { return "1.0.2.1 PURE 1.3.2"; }
+        public string GetPluginVersion() { return "1.0.2.1 PURE 1.3.3"; }
         /// <summary>Allows PRoCon to get the author's name of this plugin.</summary>
         public string GetPluginAuthor() { return "Imisnew2. Modified for PURE by CrashCourse001"; }
         /// <summary>Allows PRoCon to get the website for this plugin.</summary>
@@ -1948,7 +1948,7 @@ namespace PRoConEvents
                 mInGamePromotionMessage = strValue;
             
             //Section 9.1 PURE
-            else if (strVariable.Contains("Soldier name:") && strVariable.Contains("TSSync Player Exclusion") && !String.IsNullOrEmpty(strValue.Trim()))
+            else if (strVariable.Contains("Soldier name:") && strVariable.Contains("TSSync Player Exclusion"))
             {
                 strValue = strValue.Trim().ToLower();
                 try
@@ -1961,7 +1961,7 @@ namespace PRoConEvents
                 }
                 //performExclusionListMaintenance();
             }
-            else if (strVariable.Contains("Add a soldier name..."))
+            else if (strVariable.Contains("Add a soldier name...") && !String.IsNullOrEmpty(strValue.Trim()))
             {
                 mExclusionList.Add(strValue.Trim().ToLower());
                 //performExclusionListMaintenance();
