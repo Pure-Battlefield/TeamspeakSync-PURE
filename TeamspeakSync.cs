@@ -1269,7 +1269,7 @@ namespace PRoConEvents
         /// <summary>Allows PRoCon to get the name of this plugin.</summary>
         public string GetPluginName() { return "Teamspeak 3 Sync"; }
         /// <summary>Allows PRoCon to get the version of this plugin.</summary>
-        public string GetPluginVersion() { return "1.0.2.1 PURE 1.4.0"; }
+        public string GetPluginVersion() { return "1.0.2.1 PURE 1.4.1"; }
         /// <summary>Allows PRoCon to get the author's name of this plugin.</summary>
         public string GetPluginAuthor() { return "Imisnew2. Modified for PURE by CrashCourse001 and Analytalica"; }
         /// <summary>Allows PRoCon to get the website for this plugin.</summary>
@@ -1956,16 +1956,16 @@ namespace PRoConEvents
             else if (strVariable.Contains("Soldier name:"))
             {
                 strValue = strValue.Trim().ToLower();
-                consoleWrite("strVariable: " + strVariable + ", strValue Trimmed Lowered: " + strValue);
+                //consoleWrite("strVariable: " + strVariable + ", strValue Trimmed Lowered: " + strValue);
                 try
                 {
                     int n = getConfigIndex(strVariable);
-                    consoleWrite("Setting " + n);
+                    //consoleWrite("Setting " + n);
                     mExclusionList[n] = strValue;
                 }
                 catch (ArgumentOutOfRangeException e)
                 {
-                    consoleWrite("" + e);
+                    //consoleWrite("" + e);
                     mExclusionList.Add(strValue);
                 }
                 //performExclusionListMaintenance();
